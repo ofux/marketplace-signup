@@ -1,13 +1,12 @@
 use std::str::FromStr;
 
 use starknet::{
-    accounts::{single_owner::GetNonceError, SingleOwnerAccount},
+    accounts::SingleOwnerAccount,
     core::{
         chain_id::{MAINNET, TESTNET},
-        types::{BlockId, FieldElement, InvokeFunctionTransactionRequest},
-        utils::get_selector_from_name,
+        types::FieldElement,
     },
-    providers::{Provider, SequencerGatewayProvider},
+    providers::SequencerGatewayProvider,
     signers::{LocalWallet, SigningKey},
 };
 
@@ -48,35 +47,6 @@ impl StarkNetClient {
             provider,
             account: SingleOwnerAccount::new(account_provider, signer, account_address, chain_id),
             badge_registry_address,
-        }
-    }
-
-    pub async fn get_2d_nonce(
-        &self,
-        nonce_key: FieldElement,
-    ) -> Result<FieldElement, GetNonceError<<SequencerGatewayProvider as Provider>::Error>> {
-        let call_result = self
-            .provider
-            .call_contract(
-                InvokeFunctionTransactionRequest {
-                    contract_address: self.account.address(),
-                    entry_point_selector: get_selector_from_name("get_nonce").unwrap(),
-                    calldata: vec![nonce_key],
-                    signature: vec![],
-                    max_fee: FieldElement::ZERO,
-                },
-                BlockId::Latest,
-            )
-            .await
-            .map_err(GetNonceError::ProviderError)?;
-
-        if call_result.result.len() == 1 {
-            Ok(call_result.result[0])
-        } else {
-            Err(GetNonceError::InvalidResponseLength {
-                expected: 1,
-                actual: call_result.result.len(),
-            })
         }
     }
 }

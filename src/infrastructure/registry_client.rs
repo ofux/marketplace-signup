@@ -78,18 +78,12 @@ impl OnChainRegistry for StarkNetClient {
         user_account_address: Self::AccountAddress,
         user_id: Self::ContributorId,
     ) -> Result<Self::TransactionHash, RegistryError> {
-        let nonce = self
-            .get_2d_nonce(user_id)
-            .await
-            .map_err(|e| RegistryError::Nonce(Box::new(e)))?;
-
         self.account
             .execute(&[Call {
                 to: self.badge_registry_address,
                 selector: get_selector_from_name("register_github_identifier").unwrap(),
                 calldata: vec![user_account_address, user_id],
             }])
-            .nonce(nonce)
             .send()
             .await
             .map_err(|e| RegistryError::Transaction(Box::new(e)))

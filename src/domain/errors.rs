@@ -36,8 +36,6 @@ pub enum SignatureError {
 
 #[derive(Debug, Error)]
 pub enum RegistryError {
-    #[error("Nonce error")]
-    Nonce(#[source] Box<dyn std::error::Error>),
     #[error("Transaction failed")]
     Transaction(#[source] Box<dyn std::error::Error>),
 }
