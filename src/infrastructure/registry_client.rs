@@ -1,7 +1,7 @@
 use starknet::{
-    accounts::{Account, AccountCall, Call},
+    accounts::{Account, Call},
     core::{
-        types::{BlockId, FieldElement, InvokeFunctionTransactionRequest},
+        types::{BlockId, CallFunction, FieldElement},
         utils::get_selector_from_name,
     },
     providers::Provider,
@@ -53,7 +53,7 @@ impl OnChainRegistry for StarkNetClient {
     ) -> Result<(), SignatureError> {
         self.provider
             .call_contract(
-                InvokeFunctionTransactionRequest {
+                CallFunction {
                     contract_address: account_address,
                     entry_point_selector: get_selector_from_name("is_valid_signature").unwrap(),
                     calldata: vec![
@@ -62,8 +62,6 @@ impl OnChainRegistry for StarkNetClient {
                         signed_data.signature.r,
                         signed_data.signature.s,
                     ],
-                    signature: vec![],
-                    max_fee: FieldElement::ZERO,
                 },
                 BlockId::Latest,
             )
